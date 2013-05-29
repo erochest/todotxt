@@ -34,6 +34,7 @@ library
 executable gtd
   main-is:             Gtd.hs
   build-depends:       base ==4.6.*
+                     , todotxt
                      , classy-prelude
                      , cmdargs
                      , text

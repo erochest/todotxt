@@ -34,6 +34,7 @@ todoItem = Todo <$> status
                 <*> lift label
                 <*> pure Nothing
                 <*> pure Nothing
+                <*> optional (lift progress)
                 <*> optional (lift project)
                 <*> many1 (lift context)
 
@@ -73,6 +74,7 @@ label :: Parser T.Text
 label = scan (Left 'x') step
     where step (Right _) '+' = Nothing
           step (Right _) '@' = Nothing
+          step (Right _) '[' = Nothing
           step _         c | isSpace c = Just (Right c)
                            | otherwise = Just (Left c)
 
@@ -87,6 +89,11 @@ monthDay :: Parser MonthDay
 monthDay =   (,)
          <$> (char '(' *> decimal <* char '/')
          <*> (decimal <* char ')')
+
+progress :: Parser Progress
+progress = char '[' *> progress' <* char ']' <* many space
+    where progress' = Progress <$> optional (decimal <* char '/')
+                               <*> decimal
 
 project :: Parser Project
 project = prefixed '+'

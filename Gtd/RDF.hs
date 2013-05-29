@@ -41,6 +41,10 @@ todoToTriples nss year (n, arcs) Todo{..} = (n + 1, arcs')
           ddate   = gtdName "duedate"
           ctx     = gtdName "context"
           proj    = gtdName "project"
+          prog    = gtdName "progress"
+          progD   = gtdName "progressDone"
+          progE   = gtdName "progressEstimate"
+
 
           insert' = flip maybeInsert
           arcs'   = insert' (flip toRDFTriple rdfType <$> item <*> titem)
@@ -51,9 +55,20 @@ todoToTriples nss year (n, arcs) Todo{..} = (n + 1, arcs')
                   . insert' (toRDFTriple <$> item <*> tdone <*> dtime)
                   . insert' (toRDFTriple <$> item <*> ddate <*> fmap (dueDate year dtime) todoDate)
                   . insert' (toRDFTriple <$> item <*> proj <*> (makeTextName nss "p" =<< todoProject))
+                  . flip (foldl' maybeInsert) (progressRdf item n prog progD progE todoProgress)
                   $ foldl' maybeInsert arcs [ toRDFTriple <$> item <*> ctx <*> makeTextName nss "c" context
                                             | context <- todoContexts
                                             ]
+
+progressRdf :: Maybe ScopedName -> Int -> Maybe ScopedName -> Maybe ScopedName
+            -> Maybe ScopedName -> Maybe Progress -> [Maybe RDFTriple]
+progressRdf _ _ _ _ _ Nothing = []
+progressRdf item n prog progD progE (Just (Progress done estimate)) =
+        [ toRDFTriple <$> item <*> prog <*> pure parent
+        , toRDFTriple parent <$> progD <*> done
+        , flip (toRDFTriple parent) estimate <$> progE
+        ]
+        where parent = Blank $ show n ++ "progress"
 
 quickGraph :: NamespaceMap -> RDFArcSet -> RDFGraph
 quickGraph nss arcs = emptyRDFGraph { namespaces = nss

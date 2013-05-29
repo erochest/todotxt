@@ -20,11 +20,15 @@ type Context  = T.Text
 type Priority = Char
 type MonthDay = (Int, Int)
 
+data Progress = Progress (Maybe Int) Int
+              deriving (Show)
+
 data TodoItem = Todo 
               { todoStatus   :: TodoStatus
               , todoLabel    :: T.Text
               , todoUri      :: Maybe URI
               , todoDate     :: Maybe MonthDay
+              , todoProgress :: Maybe Progress
               , todoProject  :: Maybe Project
               , todoContexts :: [Context]
               } deriving (Show)
