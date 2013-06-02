@@ -19,6 +19,7 @@ library
   exposed-modules:     Gtd.Parser
                      , Gtd.RDF
                      , Gtd.Types
+                     , Gtd.Utils
   -- other-modules:       
   build-depends:       base ==4.6.*
                      , classy-prelude

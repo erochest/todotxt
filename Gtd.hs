@@ -23,6 +23,7 @@ import           System.IO (hPutStrLn, stderr)
 
 import Gtd.Parser
 import Gtd.RDF
+import Gtd.Utils
 
 
 -- | main
@@ -34,13 +35,20 @@ main = do
             Just p -> do
                 tz <- getCurrentTimeZone
                 yr <- getYear . zonedTimeToUTC <$> getZonedTime
-                TIO.interact (either printError (printGraph output p yr n) . parseTodos tz)
+                TIO.interact ( either printError (printGraph output p yr n)
+                             . doPending pending
+                             . parseTodos tz
+                             )
             Nothing ->
                 hPutStrLn stderr "A valid URI for the --prefix argument is \
                                  \ required. (--help for more information.)"
-    where printError          = ("ERROR: " ++) . T.pack
+    where printError = ("ERROR: " ++) . T.pack
+
           printGraph Turtle p yr n = formatGraphAsText . todoListToGraph p yr n
           printGraph Raw    _ _  _ = T.intercalate "\n" . map (T.pack . show)
+
+          doPending False = id
+          doPending True  = fmap (fmap setPending)
 
 -- | Command-line processing
 
@@ -49,16 +57,18 @@ data OutputFormat = Raw
                   deriving (Show, Data, Typeable)
 
 data GtdArgs = GtdArgs
-             { prefix :: Maybe String
-             , n      :: Int
-             , output :: OutputFormat
+             { prefix  :: Maybe String
+             , n       :: Int
+             , output  :: OutputFormat
+             , pending :: Bool
              } deriving (Show, Data, Typeable)
 
 gtdArgs :: GtdArgs
 gtdArgs = GtdArgs
-        { prefix = def &= help "The prefix for IRIs generated."
-        , n      = def &= help "The number to begin indexing the items with."
-        , output = Turtle &= typ "FORMAT" &= help "The output format (raw, *turtle*)."
+        { prefix  = def &= help "The prefix for IRIs generated."
+        , n       = def &= help "The number to begin indexing the items with."
+        , output  = Turtle &= typ "FORMAT" &= help "The output format (raw, *turtle*)."
+        , pending = False &= help "Set all active items to pending."
         } &= summary "gtd"
           &= details ["Parse a todotxt file into RDF turtle."]
 
