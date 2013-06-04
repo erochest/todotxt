@@ -33,7 +33,3 @@ data TodoItem = Todo
               , todoContexts :: [Context]
               } deriving (Show)
 
--- | Parser
-
-type ZonedParser = ReaderT TimeZone Parser
-

@@ -16,6 +16,9 @@ import           Data.Time
 import           Gtd.Types
 import           Network.URI
 
+-- | Parser
+
+type ZonedParser = ReaderT TimeZone Parser
 
 getTZ :: ZonedParser TimeZone
 getTZ = ask
