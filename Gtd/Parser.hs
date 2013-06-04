@@ -1,16 +1,15 @@
-{-# LANGUAGE NoImplicitPrelude     #-}
 {-# LANGUAGE OverloadedStrings     #-}
 {-# LANGUAGE RecordWildCards       #-}
 
 module Gtd.Parser where
 
-import           ClassyPrelude
 import           Control.Applicative
 import           Control.Error
 import           Control.Monad.Reader
 import           Data.Attoparsec.Text
 import           Data.Char (isLetter, isSpace)
 import           Data.Maybe (fromJust)
+import           Data.Monoid ((<>))
 import qualified Data.Text as T
 import           Data.Time
 import           Gtd.Types
@@ -83,7 +82,7 @@ label = scan (Left 'x') step
 
 uri :: Parser URI
 uri = ptext <$> u
-    where u   =   (++)
+    where u   =   (<>)
               <$> (string "http://" <|> string "https://")
               <*> takeTill isSpace
           ptext = fromJust . parseURI . T.unpack

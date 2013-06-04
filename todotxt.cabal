@@ -22,7 +22,6 @@ library
                      , Gtd.Utils
   -- other-modules:       
   build-depends:       base ==4.6.*
-                     , classy-prelude
                      , text
                      , time
                      , swish

@@ -1,10 +1,10 @@
 {-# LANGUAGE OverloadedStrings     #-}
-{-# LANGUAGE NoImplicitPrelude     #-}
 {-# LANGUAGE RecordWildCards       #-}
 
 module Gtd.RDF where
 
-import           ClassyPrelude
+import           Control.Applicative
+import           Data.Char (toLower)
 import           Data.List (foldl')
 import qualified Data.Map as M
 import qualified Data.Set as S
@@ -87,14 +87,14 @@ makeNamespaces prefix = M.fromList [ (Just "gtd",  extendPath prefix "/gtd#")
                                    , getNamespaceTuple namespaceXSD
                                    ]
 
-makeName :: NamespaceMap -> Text -> LName -> Maybe ScopedName
+makeName :: NamespaceMap -> T.Text -> LName -> Maybe ScopedName
 makeName nss pre lname = flip (makeScopedName mpre) lname <$> M.lookup mpre nss
     where mpre = Just pre
 
-makeTextName :: NamespaceMap -> Text -> Text -> Maybe ScopedName
+makeTextName :: NamespaceMap -> T.Text -> T.Text -> Maybe ScopedName
 makeTextName nss pre tname = newLName tname >>= makeName nss pre
 
-makeStringName :: NamespaceMap -> Text -> String -> Maybe ScopedName
+makeStringName :: NamespaceMap -> T.Text -> String -> Maybe ScopedName
 makeStringName nss pre = makeTextName nss pre . T.pack
 
 todoListToGraph :: URI -> Integer -> Int -> [TodoItem] -> RDFGraph
