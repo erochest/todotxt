@@ -16,7 +16,8 @@ build-type:          Simple
 cabal-version:       >=1.8
 
 library
-  exposed-modules:     Gtd.Parser
+  exposed-modules:     Gtd.Formatter
+                     , Gtd.Parser
                      , Gtd.RDF
                      , Gtd.Types
                      , Gtd.Utils
@@ -24,6 +25,7 @@ library
   build-depends:       base ==4.6.*
                      , text
                      , time
+                     , old-locale
                      , swish
                      , attoparsec
                      , network
@@ -39,6 +41,7 @@ executable gtd
                      , cmdargs
                      , text
                      , time
+                     , old-locale
                      , swish
                      , attoparsec
                      , network

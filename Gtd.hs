@@ -21,6 +21,7 @@ import           Swish.RDF.Formatter.Turtle
 import           System.Console.CmdArgs
 import           System.IO (hPutStrLn, stderr)
 
+import Gtd.Formatter
 import Gtd.Parser
 import Gtd.RDF
 import Gtd.Types
@@ -32,9 +33,10 @@ import Gtd.Utils
 printError :: String -> T.Text
 printError = ("ERROR: " ++) . T.pack
 
-printGraph :: OutputFormat -> URI -> Integer -> Int -> [TodoItem] -> T.Text
-printGraph Turtle p yr n = formatGraphAsText . todoListToGraph p yr n
-printGraph Raw    _ _  _ = T.intercalate "\n" . map (T.pack . show)
+printGraph :: OutputFormat -> URI -> (TimeZone, Integer) -> Int -> [TodoItem] -> T.Text
+printGraph Turtle  p (_, yr) n = formatGraphAsText . todoListToGraph p yr n
+printGraph TodoTxt _ (tz, _) _ = formatTodoTxtList tz
+printGraph Raw     _ _       _ = T.intercalate "\n" . map (T.pack . show)
 
 doPending :: Bool -> Either String [TodoItem] -> Either String [TodoItem]
 doPending False = id
@@ -53,7 +55,7 @@ main = do
             Just p -> do
                 tz <- getCurrentTimeZone
                 yr <- getYear . zonedTimeToUTC <$> getZonedTime
-                TIO.interact ( either printError (printGraph output p yr n)
+                TIO.interact ( either printError (printGraph output p (tz, yr) n)
                              . doArchive archive
                              . doPending pending
                              . parseTodos tz
@@ -67,6 +69,7 @@ main = do
 
 data OutputFormat = Raw
                   | Turtle
+                  | TodoTxt
                   deriving (Show, Data, Typeable)
 
 data GtdArgs = GtdArgs
@@ -81,7 +84,8 @@ gtdArgs :: GtdArgs
 gtdArgs = GtdArgs
         { prefix  = def &= help "The prefix for IRIs generated."
         , n       = def &= help "The number to begin indexing the items with."
-        , output  = Turtle &= typ "FORMAT" &= help "The output format (raw, *turtle*)."
+        , output  = TodoTxt &= typ "FORMAT"
+                  &= help "The output format (raw, *todotxt*, turtle)."
         , pending = False &= help "Set all active items to pending."
         , archive = False &= help "Archive all completed items as they're read."
         } &= summary "gtd"

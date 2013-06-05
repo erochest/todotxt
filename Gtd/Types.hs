@@ -2,8 +2,6 @@
 module Gtd.Types where
 
 
-import           Control.Monad.Reader
-import           Data.Attoparsec.Text
 import qualified Data.Text as T
 import           Data.Time
 import           Network.URI
