@@ -21,7 +21,6 @@ import           Data.Time
 import           Network.URI
 import           Swish.RDF.Formatter.Turtle
 import           System.Console.CmdArgs
-import           System.IO (hPutStrLn, stderr)
 
 import Gtd.Formatter
 import Gtd.Parser
