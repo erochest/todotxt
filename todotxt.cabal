@@ -33,6 +33,22 @@ library
                      , containers
                      , mtl
 
+executable todotxt
+  main-is:             TodoTxt.hs
+  build-depends:       base ==4.6.*
+                     , todotxt
+                     -- , classy-prelude
+                     -- , cmdargs
+                     -- , text
+                     -- , time
+                     -- , old-locale
+                     -- , swish
+                     -- , attoparsec
+                     -- , network
+                     -- , errors
+                     -- , containers
+                     -- , mtl
+
 executable gtd
   main-is:             Gtd.hs
   build-depends:       base ==4.6.*
